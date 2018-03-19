@@ -11,13 +11,17 @@ void AsciiBlink::begin(uint16_t maxSymbols) {
     this->lastCharId    = 0;
     this->displayCharId = 0;
     this->frameList     = malloc(sizeof(uint8_t*) * maxSymbols);
-    this->nextFrameTime = 0;
+    this->nextFrameTime = 1000;
 
     Serial.begin(115200);
 }
 
 bool AsciiBlink::registerNewString(char* string) {
     for (uint8_t i = 0; string[i] != '\0'; i++) {
+        if (this->lastCharId >= this->maxSymbols) {
+            return false;
+        }
+
         this->frameList[this->lastCharId] = register8bitBinaryArray( getAsciiCode( string[i] ) );
 
         for (uint8_t bit = 0; bit < 8; bit++) {
@@ -26,6 +30,17 @@ bool AsciiBlink::registerNewString(char* string) {
 
         this->lastCharId++;
     }
+    return true;
+}
+
+bool AsciiBlink::registerNewDelay() {
+    if (this->lastCharId >= this->maxSymbols) {
+        return false;
+    }
+    
+    this->frameList[this->lastCharId] = register8bitBinaryArray( (char) 0 );
+
+    this->lastCharId++;
 }
 
 void AsciiBlink::setFrameTime(uint16_t milliseconds) {
