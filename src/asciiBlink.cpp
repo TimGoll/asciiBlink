@@ -11,8 +11,12 @@ void AsciiBlink::begin(uint16_t maxSymbols) {
     this->lastCharId    = 0;
     this->displayCharId = 0;
     this->frameList     = malloc(sizeof(uint8_t*) * maxSymbols);
-    this->nextFrameTime = 1000;
+    this->frameTime     = 1000;
+    this->pauseTime     = 50;
+    this->displayBreak  = 0;
+}
 
+void AsciiBlink::enableDebug() {
     Serial.begin(115200);
 }
 
@@ -37,14 +41,28 @@ bool AsciiBlink::registerNewDelay() {
     if (this->lastCharId >= this->maxSymbols) {
         return false;
     }
-    
+
     this->frameList[this->lastCharId] = register8bitBinaryArray( (char) 0 );
+
+    this->lastCharId++;
+}
+
+bool AsciiBlink::registerNewOnDelay() {
+    if (this->lastCharId >= this->maxSymbols) {
+        return false;
+    }
+
+    this->frameList[this->lastCharId] = register8bitBinaryArray( (char) 255 );
 
     this->lastCharId++;
 }
 
 void AsciiBlink::setFrameTime(uint16_t milliseconds) {
     this->frameTime = milliseconds;
+}
+
+void AsciiBlink::setPauseTime(uint16_t milliseconds) {
+    this->pauseTime = milliseconds;
 }
 
 void AsciiBlink::definePins(uint8_t p0, uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4, uint8_t p5, uint8_t p6, uint8_t p7) {
@@ -60,26 +78,38 @@ void AsciiBlink::definePins(uint8_t p0, uint8_t p1, uint8_t p2, uint8_t p3, uint
 
 void AsciiBlink::update() {
     if (millis() >= this->nextFrameTime) {
-        //display character
-        if (this->frameList[this->displayCharId][0] <= 1) {
-            //render to LEDs
-            Serial.print("[");
+        //little displayBreak
+        if (this->displayBreak) {
             for (uint8_t i = 0; i < 8; i++) {
-                digitalWrite(pins[i], this->frameList[this->displayCharId][i]);
-                Serial.print(this->frameList[this->displayCharId][i]);
+                digitalWrite(pins[i], LOW);
             }
-            Serial.println("]");
-            this->nextFrameTime += this->frameTime;
-        }
-        //display special frame
-        else {
-
+            this->nextFrameTime+=this->pauseTime;
         }
 
-        this->displayCharId++;
-        if (this->displayCharId == this->lastCharId) {
-            this->displayCharId = 0;
+        //display character
+        if (!this->displayBreak) {
+            if (this->frameList[this->displayCharId][0] <= 1) {
+                //render to LEDs
+                Serial.print("[");
+                for (uint8_t i = 0; i < 8; i++) {
+                    digitalWrite(pins[i], this->frameList[this->displayCharId][i]);
+                    Serial.print(this->frameList[this->displayCharId][i]);
+                }
+                Serial.println("]");
+                this->nextFrameTime += this->frameTime;
+            }
+            //display special frame
+            else {
+
+            }
+
+            this->displayCharId++;
+            if (this->displayCharId == this->lastCharId) {
+                this->displayCharId = 0;
+            }
         }
+
+        this->displayBreak = !this->displayBreak;
     }
 }
 

@@ -2,6 +2,9 @@ AsciiBlink KEYWORD2
 begin KEYWORD1
 registerNewString KEYWORD1
 registerNewDelay KEYWORD1
+registerNewOnDelay KEYWORD1
 definePins KEYWORD1
 setFrameTime KEYWORD1
+setPauseTime KEYWORD1
 update KEYWORD1
+enableDebug KEYWORD1
