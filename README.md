@@ -30,6 +30,9 @@ Registers a delay like any other char. Returns false if memory overflows.
 `bool asciiBlink.registerNewOnDelay();`:<br>
 Registers a delay like any other char. All eight LEDs are turned on. Returns false if memory overflows.
 
+`bool asciiBlink.test();`:<br>
+Registers eight chars which are displayed after one another. Useful to test the connected LEDs.
+
 `void asciiBlink.update();`:<br>
 Must be called in your main loop to process the LED value.
 

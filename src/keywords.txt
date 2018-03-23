@@ -8,3 +8,4 @@ setFrameTime KEYWORD1
 setPauseTime KEYWORD1
 update KEYWORD1
 enableDebug KEYWORD1
+test KEYWORD1

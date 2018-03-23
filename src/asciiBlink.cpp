@@ -42,7 +42,7 @@ bool AsciiBlink::registerNewDelay() {
         return false;
     }
 
-    this->frameList[this->lastCharId] = register8bitBinaryArray( (char) 0 );
+    this->frameList[this->lastCharId] = register8bitBinaryArray( 0 );
 
     this->lastCharId++;
 }
@@ -52,9 +52,23 @@ bool AsciiBlink::registerNewOnDelay() {
         return false;
     }
 
-    this->frameList[this->lastCharId] = register8bitBinaryArray( (char) 255 );
+    this->frameList[this->lastCharId] = register8bitBinaryArray( 255 );
 
     this->lastCharId++;
+}
+
+bool AsciiBlink::test() {
+    for (int i = 0; i < 8; i++) {
+        if (this->lastCharId >= this->maxSymbols) {
+            return false;
+        }
+
+        this->frameList[this->lastCharId] = register8bitBinaryArray( pow(2, i) + 0.5);
+
+        this->lastCharId++;
+    }
+
+    return true;
 }
 
 void AsciiBlink::setFrameTime(uint16_t milliseconds) {
@@ -129,6 +143,15 @@ uint8_t* AsciiBlink::register8bitBinaryArray(uint8_t input) {
         buf = buf % div;
         div /= 2;
     }
+
+    Serial.print("Register Char ID: ");
+    Serial.print(input);
+    Serial.print(" - ");
+    Serial.print("[");
+    for (uint8_t i = 0; i < 8; i++) {
+        Serial.print(arr[i]);
+    }
+    Serial.println("]");
 
     return arr;
 }
