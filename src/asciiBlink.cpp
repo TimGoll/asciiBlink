@@ -28,10 +28,6 @@ bool AsciiBlink::registerNewString(char* string) {
 
         this->frameList[this->lastCharId] = register8bitBinaryArray( getAsciiCode( string[i] ) );
 
-        for (uint8_t bit = 0; bit < 8; bit++) {
-            Serial.print(this->frameList[this->lastCharId][bit]);
-        }
-
         this->lastCharId++;
     }
     return true;
